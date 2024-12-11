@@ -37,15 +37,28 @@ def generate_variations(dist_tensor, voter_ids, directions=10, steps=5, alpha=0.
     return output_tensor
 
 
-def directed_step(whole_group, group_to_optimize, dist_tensor, directions=10, steps=5, alpha=0.02):
-    group_to_optimize_ids = group_to_optimize.voter_ids
-    to_test = generate_variations(dist_tensor, group_to_optimize_ids, directions, steps, alpha)
-    avg_happiness = []
-    for i in range(len(to_test)):
-        temp_dist_tensor = to_test[i]
-        outcome = whole_group.calculate_winner(temp_dist_tensor)
-        sub_group_happiness = group_to_optimize.avg_happiness(outcome)
-        avg_happiness.append(sub_group_happiness)
-    argmax = torch.argmax(torch.tensor(avg_happiness))
-    better_dist_tensor = to_test[argmax]
-    return better_dist_tensor
+# def bad_directed_step(whole_group, group_to_optimize, dist_tensor, directions=10, steps=5, alpha=0.02):
+#     group_to_optimize_ids = group_to_optimize.voter_ids
+#     to_test = generate_variations(dist_tensor, group_to_optimize_ids, directions, steps, alpha)
+#     avg_happiness = []
+#     for i in range(len(to_test)):
+#         temp_dist_tensor = to_test[i]
+#         outcome = whole_group.calculate_winner(temp_dist_tensor)
+#         sub_group_happiness = group_to_optimize.avg_happiness(outcome)
+#         avg_happiness.append(sub_group_happiness)
+#     argmax = torch.argmax(torch.tensor(avg_happiness))
+#     better_dist_tensor = to_test[argmax]
+#     return better_dist_tensor
+
+def directed_step(whole_group, group_to_optimize, dist_tensor):
+    ## Want to get above inputs, and output a dist_tensor that represents some sort of collective action by a subgroup
+    ## Thus, all the slightly different
+    ## Assuming all same preferences: everyone has same distribution
+    ## Assuming mostly same preferences: hmm, try to shift interest onto things agreed upon
+    ## ok so calculate winner of subgroup; that maximizes their happiness, no reason to toggle any of those
+    ## make a big voter with m votes instead of 1,
+    ## uniform simplex, or random walk simplex
+
+    representative_preference = group_to_optimize.calculate_true_winner()
+    representative_interest = group_to_optimize.calculate_interest()
+    representative = Voter(representative_preference)

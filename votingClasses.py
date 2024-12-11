@@ -1,20 +1,18 @@
-
 #%% Imports and variables
 
 import os
+
 os.chdir('/interest-CSCS')
 import torch
 import samplingProfileSpace as sps
 from monteCarloOptimization import directed_step
-
-
-
 
 #%% Variables
 number_of_pairwise_elections = 3
 number_of_voters = 100
 n = number_of_pairwise_elections
 v = number_of_voters
+
 
 #%%
 
@@ -26,12 +24,15 @@ class Voter:
 
     def calculate_happiness(self, outcome):
         win_loss_dist = self.preferences * outcome  # prefs is n-d vec of -1's and 1's, so is outcome. Wins are 1, loss are -1.
-        scaled_win_loss_dist = win_loss_dist * self.interest
-        return sum(scaled_win_loss_dist)
+        return torch.dot(win_loss_dist, self.interest)
 
     def cast_vote(self, dist_tensor):
         dist = dist_tensor[self.voter_id]
         cast = dist * self.preferences
+        return cast
+
+    def cast_true_vote(self):
+        cast = self.preferences * self.interest
         return cast
 
 
@@ -40,13 +41,29 @@ class VoterGroup:
         self.voter_list = voter_list
         self.voter_ids = [n.voter_id for n in voter_list]
 
-    def calculate_winner(self, dist_tensor):  # If just this group voted, what would the election results look like?
+    def calculate_tally(self, dist_tensor):  # If just this group voted, what would the election results look like?
         cast_vote_list = []
         # For this part, take ID of all the voters, use that to get index for all the vote-prefs that matter
         for single_voter in self.voter_list:
             cast_vote_list.append(single_voter.cast_vote(dist_tensor))
         tally = torch.sum(torch.stack(cast_vote_list), dim=0)
+        return tally
+
+    def calculate_winner(self, dist_tensor):
+        tally = self.calculate_tally(dist_tensor)
         winners = torch.where(tally <= 0, -1, 1)  # with this scheme, -1 wins in the case of a tie
+        return winners
+
+    def calculate_true_tally(self):
+        cast_vote_list = []
+        for single_voter in self.voter_list:
+            cast_vote_list.append(single_voter.cast_true_vote())
+        tally = torch.sum(torch.stack(cast_vote_list), dim=0)
+        return tally
+
+    def calculate_true_winner(self):
+        tally = self.calculate_true_tally()
+        winners = torch.where(tally <= 0, -1, 1)
         return winners
 
     def avg_happiness(self, outcome):

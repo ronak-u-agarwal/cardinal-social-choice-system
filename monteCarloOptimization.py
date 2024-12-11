@@ -1,10 +1,8 @@
 #%% Imports
 import os
 
-os.chdir('/interest-CSCS')
 import torch
 from votingClasses import Voter, VoterGroup, n, v
-import samplingProfileSpace as sps
 
 
 

@@ -1,7 +1,7 @@
 #%%
 
 import os
-os.chdir('/interest-CSCS')
+os.chdir('/Users/ronakagarwal/Coding projects/pythonProjects/modellingSocialChoiceSystems/cardinal-social-choice-system')
 import torch
 from votingClasses import Voter, VoterGroup, n, v
 import samplingProfileSpace as sps

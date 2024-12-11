@@ -1,11 +1,7 @@
 #%% Imports and variables
 
-import os
-
-os.chdir('/interest-CSCS')
 import torch
-import samplingProfileSpace as sps
-from monteCarloOptimization import directed_step
+
 
 #%% Variables
 number_of_pairwise_elections = 3

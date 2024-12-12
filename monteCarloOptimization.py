@@ -5,16 +5,16 @@ import torch
 from votingClasses import Voter, VoterGroup, n, v
 
 
-
 #%%
-def take_steps(voter_dist, alpha, steps):
+def take_steps(point_on_simplex, alpha, steps):
     # choose 2 indices randomly, shift them IF POSSIBLE, do a steps number of times
-    new = voter_dist.clone()
+    new = point_on_simplex.clone()
     for _ in range(steps):
         i, j = torch.randperm(len(new))[:2]
-        if new[i] > alpha:
-            new[i] -= alpha
-            new[j] += alpha
+        epsilon = torch.rand(1)*alpha
+        if new[i] > epsilon:
+            new[i] -= epsilon
+            new[j] += epsilon
         else:
             epsilon = new[i].item()
             new[i] = 0.0
@@ -48,15 +48,14 @@ def generate_variations(dist_tensor, voter_ids, directions=10, steps=5, alpha=0.
 #     better_dist_tensor = to_test[argmax]
 #     return better_dist_tensor
 
-def directed_step(whole_group, group_to_optimize, dist_tensor):
-    ## Want to get above inputs, and output a dist_tensor that represents some sort of collective action by a subgroup
-    ## Thus, all the slightly different
-    ## Assuming all same preferences: everyone has same distribution
-    ## Assuming mostly same preferences: hmm, try to shift interest onto things agreed upon
-    ## ok so calculate winner of subgroup; that maximizes their happiness, no reason to toggle any of those
-    ## make a big voter with m votes instead of 1,
-    ## uniform simplex, or random walk simplex
+def create_rep_voter(whole_group, group_to_optimize, dist_tensor):
+    ## Use rep voter assumption:
+    ## create a big voter, new voting group with whole_group - group_to_optimize + rep voter
+    ## initialize rep voter with preferences, interest, etc. as calculated in obsidian
+    ## return a new group with normal voters, and then a big guy for group to optimize; also new dist_tensor
+
 
     representative_preference = group_to_optimize.calculate_true_winner()
     representative_interest = group_to_optimize.calculate_interest()
     representative = Voter(representative_preference)
+

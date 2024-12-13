@@ -48,14 +48,28 @@ def generate_variations(dist_tensor, voter_ids, directions=10, steps=5, alpha=0.
 #     better_dist_tensor = to_test[argmax]
 #     return better_dist_tensor
 
-def create_rep_voter(whole_group, group_to_optimize, dist_tensor):
-    ## Use rep voter assumption:
+def create_rep_voter(whole_group, group_to_represent):
+    ## Use rep voter thm:
     ## create a big voter, new voting group with whole_group - group_to_optimize + rep voter
     ## initialize rep voter with preferences, interest, etc. as calculated in obsidian
     ## return a new group with normal voters, and then a big guy for group to optimize; also new dist_tensor
+    ## IMPORTANT: ONLY WORKS IF NO VOTERS HAVE -1 HAPPINESS WITH RV PREFS
+    ## IMPORTANT: ONLY INITIAL SETTING OF INTEREST FOR SURE WORKS AS VOTE DIST
+    rep_preference = group_to_represent.group_preferences #
+    rep_interest = group_to_represent.group_interest # remember group interest doesn't add up to 1 or to size, just use for happiness
+    rep_size = group_to_represent.group_size  # so if the group to optimize has
+    rep_id = group_to_represent.group_id
+    rep = Voter(preferences=rep_preference, interest=rep_interest, voter_id=rep_id, size=rep_size)
+
+    # Getting all the voters in whole group and not in group_to_represent
+    new_voter_set = whole_group.voter_set - group_to_represent.voter_set
+    new_voter_set.add(rep)
+    new_voter_list = list(new_voter_set)
+    new_voter_group = VoterGroup(voter_list=new_voter_list)
+
+    return new_voter_group
 
 
-    representative_preference = group_to_optimize.calculate_true_winner()
-    representative_interest = group_to_optimize.calculate_interest()
-    representative = Voter(representative_preference)
+
+
 

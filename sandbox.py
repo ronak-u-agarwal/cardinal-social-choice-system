@@ -44,13 +44,37 @@ squish_dict = sps.recreate_dist_dict(pos_neg_squished)
 print(squish_dict)
 print("squish_dict results", pos_neg_squished.calculate_tally(squish_dict))
 print("original results", whole_unbiased_pop.calculate_tally(initial_dist_dict))
+# The reason these are different is because the RV thm + new dict doesn't just re-represent voters;
+# instead, it tallies total interest, then rescales the vote distribution to be proportional to interest, then
+# casts the votes of EVERYONE in the group with the set of preferences and distribution. In other words,
+party_list = list(pos_neg_squished.voter_set)
+print("one group cast vote", party_list[0].cast_vote(squish_dict))
+print("one group interest", party_list[0].interest)
+print("second group cast vote", party_list[1].cast_vote(squish_dict))
+print("second group interest", party_list[1].interest)
+# we can see that the cast vote is just a scaled version of interest
+
+#%% Making the positive party try to be strategic
+## Now we shall finally try stragetic voting with pos_party in the pos_party_squished pop
+pps = pos_party_squished
+distribution_dict = sps.recreate_dist_dict(pps)
+print("og pop true tally", whole_unbiased_pop.true_tally)
+print("pps true tally", pps.true_tally)
+
+print("pps pos party reduces waste", pps.calculate_tally(distribution_dict))
 
 
+## Ah i see how i can maybe get a group to collaborate:
+## if disagree with group preferences in an election, mask cast vote to 0. Then, monte
+## carlo random walk on the distribution that the group follows, apply 0 mask, and renormalize
 
+## So now, I need to make sure people would want to be in party if being in party makes them do that
 
-
-
-
+## ahh so opposing party means that party forms
+## another way of says it is this: if you know already that your preference will win, strategic voting = casting 0 vote
+## so if the positive party forms, they gain efficiency, super positive results. Then, the negative party naturally
+## forms, as negative party memebers who have a positive preference in a certain election will just not put their vote there
+## So the more powerful the party, the more individuals in the party are incentivized to vote honestly
 
 
 # make general function to sort people into parties ? or maybe just make parties, combine to have population vote

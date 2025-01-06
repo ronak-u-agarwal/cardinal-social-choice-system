@@ -146,4 +146,23 @@ print("pps pos party reduces waste", pps.calculate_tally(distribution_dict))
 # print("test's happiness", test.calculate_happiness(initial_winner))
 # print("average happiness", all_voters.avg_happiness(initial_winner))
 
+#%% broadcasting experiments
+
+
+ind = torch.tensor([[1,-1,1,-1],[1,1,-1,-1]])
+gpref = torch.tensor([1,1,1,1])
+zero_mask = ((ind*gpref) + 1)/2
+print("zero_mask", zero_mask)
+
+dist_test = torch.tensor([[0.1,0.2,0.3,0.4], [0.1,0.2,0.3,0.4]])
+print("dist_test * zero_mask", dist_test*zero_mask)
+
+
+new_dist = dist_test * zero_mask
+new_dist = new_dist/new_dist.sum(dim=1,keepdim=True)
+print("new_dist", new_dist)
+
+
+
 #%%
+

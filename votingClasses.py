@@ -36,7 +36,7 @@ class VoterGroup:
     def __init__(self, voter_list):
         self.voter_set = set(voter_list)
         self.ids = set([x.id for x in self.voter_set])
-        self.group_id = min(self.ids)
+        self.group_id = min(self.ids)  ## THIS IS DANGEROUS, FIGURE OUT BETTER LONG TERM SOLUTION
 
         sizes = [x.size for x in self.voter_set]
         self.group_size = sum(sizes)
